@@ -1,6 +1,7 @@
 package br.gov.sp.fatec.anime.service;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -47,5 +48,30 @@ public class AnimeServiceImpl implements AnimeService {
         animeRepo.save(anime);
         return anime;
     }
+    
+    
+    @Override
+	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")  // 3B
+	public Anime alterarPersonagens(String identificadorUsuario, Long identificadorAnime, String animeNome, String animeChar) {
+		Usuario usuario = usuarioRepo.findTop1ByNomeOrEmail(identificadorUsuario, identificadorUsuario);
+		if (usuario == null) {
+			throw new UsernameNotFoundException(
+					"Usuário com identificador " + identificadorUsuario + " não foi encontrado");
+		}
+		List<Anime> animes = animeRepo.findByCharUsrNomeOrCharUsrEmail(identificadorUsuario, identificadorUsuario);
+		if (animes == null) {
+			throw new UsernameNotFoundException(
+						"Anime com identificador " + identificadorAnime + " não foi encontrado");
+		}
+		Anime novoAnime = new Anime();
+		animeRepo.deleteById(identificadorAnime);
+		novoAnime.setAnimeNome(animeNome);
+		novoAnime.setAnimePersonagem(animeChar);
+		novoAnime.setAnimeAno(new Date());
+		novoAnime.setCharUsr(usuario);
+		animeRepo.save(novoAnime);
+		return novoAnime;
 
+    }
 }

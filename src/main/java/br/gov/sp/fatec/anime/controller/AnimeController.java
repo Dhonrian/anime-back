@@ -41,4 +41,10 @@ public class AnimeController {
     	return animeRepo.findByCharUsrNomeOrCharUsrEmail(charUsr, charUsr);
     }
     
+    @PostMapping(value = "/update/{animeId}")
+	@JsonView(View.AnimeCompleto.class)
+	public Anime updateAnime(@RequestBody AnimeDTO anime, @PathVariable("animeId") Long animeId) {
+		return animeService.alterarPersonagens(anime.getUsuario(), animeId, anime.getAnimeNome(), anime.getAnimePersonagem());
+	}
+    
 }
